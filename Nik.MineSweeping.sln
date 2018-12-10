@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2016
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nik.MineSweeping", "Nik.MineSweeping\Nik.MineSweeping.csproj", "{368E95DC-9920-4571-AFDC-1F39259391ED}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{368E95DC-9920-4571-AFDC-1F39259391ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{368E95DC-9920-4571-AFDC-1F39259391ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{368E95DC-9920-4571-AFDC-1F39259391ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{368E95DC-9920-4571-AFDC-1F39259391ED}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D81572D6-68FA-412B-8A84-55ACEFEA3C00}
+	EndGlobalSection
+EndGlobal
