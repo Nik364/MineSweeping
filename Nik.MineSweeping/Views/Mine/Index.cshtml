@@ -1,0 +1,48 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+    <div>
+        <span id="sName"></span>
+    </div>
+    <script src="~/Scripts/jquery-1.6.4.min.js"></script>
+    <script src="~/Scripts/jquery.signalR-2.4.0.min.js"></script>
+    <script src="~/signalr/js"></script>
+    <script>
+        $(function () {
+            $('#sName').text(prompt('请输入玩家名称'));
+
+
+            var conn = $.connection;
+            conn.hub.qs = { "name": $('#sName').text() };
+
+            var mine = conn.mine;
+
+            // 接收服务端消息 用client
+            mine.client.hello = function (msg) {
+                console.log(msg);
+            };
+
+            // 开始链接
+            conn.hub.start().done(function () {
+                mine.server.hello()
+                    .done(function () {
+
+                    })
+                    .fail(function (e) {
+                        alert(e);
+                    });
+            })
+        });
+    </script>
+</body>
+</html>
