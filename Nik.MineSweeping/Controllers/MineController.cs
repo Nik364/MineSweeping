@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using System.Web.Mvc;
 
 namespace Nik.MineSweeping.Controllers
@@ -36,9 +36,18 @@ namespace Nik.MineSweeping.Controllers
 
         /// <summary>
         /// 游戏地图
-        /// -999_未知标记 -10_地雷 -11_地雷爆炸 -19_地雷标记 -1_初始状态（未知）大于等于0的数_地雷数量
         /// </summary>
-        private CellStatus[,] map;
+        private MineCell[] map;
+
+        /// <summary>
+        /// 是否初次点击
+        /// </summary>
+        bool isFisrtClick;
+
+        /// <summary>
+        /// 游戏是否正在进行
+        /// </summary>
+        bool isPalying = false;
 
         /// <summary>
         /// ctor
@@ -51,7 +60,20 @@ namespace Nik.MineSweeping.Controllers
             this.Width = width;
             this.Height = height;
             this.MineNum = mineNum;
+        }
 
+        /// <summary>
+        /// 开始游戏
+        /// </summary>
+        public void Start()
+        {
+            if (isPalying)
+            {
+                return;
+            }
+
+            this.isFisrtClick = true;
+            this.isPalying = true;
             InitMap();
         }
 
@@ -60,21 +82,79 @@ namespace Nik.MineSweeping.Controllers
         /// </summary>
         private void InitMap()
         {
-            this.map = new CellStatus[Width, Height];
+            this.map = new MineCell[Width * Height];
             // 1、初始化地图为未知状态
-            for (int i = 0; i < Height; i++)
+            for (int i = 0; i < Width; i++)
             {
-                for (int j = 0; j < Width; j++)
+                for (int j = 0; j < Height; j++)
                 {
-                    map[i, j] = CellStatus.Unknown;
+                    // 按行列数据初始化
+                    map[i * Width + j] = new MineCell
+                    {
+                        X = i,
+                        Y = j,
+                        Status = CellStatus.Unknown
+                    };
                 }
             }
-
-            // 1、应在首次点击后，再布雷，这样就可避免初次点到雷
-
-            // 2、布雷
-            Enumerable.rep
         }
+
+        /// <summary>
+        /// 布雷
+        /// </summary>
+        /// <param name="ignoreCell">布雷忽略区域</param>
+        private void LayMines(MineCell ignoreCell)
+        {
+            // 2、应在首次点击后，再布雷，这样就可避免初次点到雷
+
+            // 3、布雷 
+        }
+
+        /// <summary>
+        /// 点击
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="cell">点击的单元格</param>
+        /// <returns>受影响的单元格</returns>
+        private List<MineCell> Click(Action action, MineCell cell)
+        {
+            var list = new List<MineCell>();
+            if (isFisrtClick)
+            {
+                this.LayMines(cell);
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// 检查地图状态  游戏是否完成
+        /// </summary>
+        /// <returns></returns>
+        private bool CheckStatus()
+        {
+            return true;
+        }
+    }
+
+    /// <summary>
+    /// 地图单元格
+    /// </summary>
+    public class MineCell
+    {
+        /// <summary>
+        /// 横坐标
+        /// </summary>
+        public int X { get; set; }
+
+        /// <summary>
+        /// 纵坐标 
+        /// </summary>
+        public int Y { get; set; }
+
+        /// <summary>
+        /// 单元格状态
+        /// </summary>
+        public CellStatus Status { get; set; }
     }
 
     /// <summary>
@@ -131,5 +211,21 @@ namespace Nik.MineSweeping.Controllers
         /// 未知标记 -10_ -11_ -19_ -1_大于等于0的数_地雷数量
         /// </summary>
         Marker = -999
+    }
+
+    /// <summary>
+    /// 玩家动作
+    /// </summary>
+    public enum Action
+    {
+        /// <summary>
+        /// 点击左键
+        /// </summary>
+        LeftClick = 0,
+
+        /// <summary>
+        /// 点击右键
+        /// </summary>
+        RightClick = 1
     }
 }
