@@ -116,7 +116,7 @@ namespace Nik.MineSweeping.Controllers
         /// <param name="action"></param>
         /// <param name="cell">点击的单元格</param>
         /// <returns>受影响的单元格</returns>
-        private List<MineCell> Click(Action action, MineCell cell)
+        public List<MineCell> Click(Action action, MineCell cell)
         {
             var list = new List<MineCell>();
             if (isFisrtClick)

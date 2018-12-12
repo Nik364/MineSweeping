@@ -32,6 +32,14 @@
                 console.log(msg);
             };
 
+            mine.client.start = function (width, height) {
+                console.log(width, height);
+            };
+
+            mine.client.click = function (cells) {
+                console.table(cells);
+            };
+
             // 开始链接
             conn.hub.start().done(function () {
                 mine.server.hello()
