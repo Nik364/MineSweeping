@@ -13,13 +13,14 @@
 <body>
     <div>
         <span id="sName"></span>
+        @ViewBag.Mine;
     </div>
     <script src="~/Scripts/jquery-1.6.4.min.js"></script>
     <script src="~/Scripts/jquery.signalR-2.4.0.min.js"></script>
     <script src="~/signalr/js"></script>
     <script>
         $(function () {
-            $('#sName').text(prompt('请输入玩家名称'));
+            //$('#sName').text(prompt('请输入玩家名称'));
 
 
             var conn = $.connection;

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
-using Nik.MineSweeping.Controllers;
+using Nik.MineSweeping.Models;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -45,7 +45,7 @@ namespace Nik.MineSweeping.Hubs
         /// <param name="act"></param>
         /// <param name="cell"></param>
         [HubMethodName("click")]
-        public void Click(Action act, MineCell cell)
+        public void Click(UserAction act, MineCell cell)
         {
             var result = game.Click(act, cell);
             Clients.All.click(result);
