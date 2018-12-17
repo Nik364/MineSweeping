@@ -12,13 +12,13 @@ namespace Nik.MineSweeping.Controllers
         // GET: Mine
         public ActionResult Index()
         {
-            var mine = new Mine(5, 5, 10);
-            mine.Start().Click(UserAction.LeftClick, new MineCell
-            {
-                X = 3,
-                Y = 6
-            });
-            ViewBag.Mine = JsonConvert.SerializeObject(mine.map);
+            //var mine = new Mine(5, 5, 10);
+            //mine.Start().Click(UserAction.LeftClick, new MineCell
+            //{
+            //    X = 3,
+            //    Y = 6
+            //});
+            //ViewBag.Mine = JsonConvert.SerializeObject(mine.Map);
             return View();
         }
     }

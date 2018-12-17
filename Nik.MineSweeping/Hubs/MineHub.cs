@@ -36,7 +36,7 @@ namespace Nik.MineSweeping.Hubs
             }
 
             game.Start();
-            Clients.All.start(width, heigth);
+            Clients.All.start(width, heigth, game.Map);
         }
 
         /// <summary>
