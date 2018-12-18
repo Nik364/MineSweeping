@@ -18,13 +18,20 @@
 
             .game .cell {
                 display: inline-block;
+                width: 30px;
+                height: 30px;
+                line-height: 30px;
+                text-align: center;
+                cursor: pointer;
+                background-color: aquamarine;
+                margin-left: 2px;
+                margin-top: 2px;
             }
     </style>
 </head>
 <body>
     <div>
         <span id="sName"></span>
-        @ViewBag.Mine;
     </div>
     <div class="game">
 
@@ -42,28 +49,36 @@
             conn.hub.qs = { "name": $('#sName').text() };
 
             var mine = conn.mine;
-
-            // 接收服务端消息 用client
-            mine.client.hello = function (msg) {
-                console.log(msg);
-            };
-
             mine.client.start = function (width, height, map) {
-                console.log(width);
-                console.log(height);
-                console.table(map);
+                //console.log(width);
+                //console.log(height);
+                //console.table(map);
 
                 initMap(width, height, map);
             };
 
             mine.client.click = function (cells) {
                 console.table(cells);
+                refreshMap(cells);
             };
 
             // 开始链接
             conn.hub.start().done(function () {
                 $('#btnStart').click(function () {
                     mine.server.start(10, 10, 10).fail(function (e) { console.log(e) });
+                })
+
+                $('.game').delegate('.cell', 'click', function () {
+                    var $cell = $(this);
+                    console.log($cell.data('x') + '-' + $cell.data('y'));
+                    mine.server
+                        .click(0, {
+                            x: $cell.data('x'),
+                            y: $cell.data('y')
+                        })
+                        .fail(function (e) {
+                            console.log(e);
+                        });
                 })
 
                 //mine.server.hello()
@@ -79,21 +94,32 @@
     <script>
         /***********************UI***************************/
         function initMap(width, height, map) {
-            var arrRow = [];
             var $row;
+            var $cell;
             for (var i = 0; i < map.length; i++) {
                 if (i % width == 0) {
-                    $row = $('<div class="row"/>');
-                    arrRow.push($row)
-
+                    $row = $('<div/>').addClass('row');
                     $('.game').append($row);
                 }
 
-                $row.append('<div class="cell">' + map[i].Status + '</div>')
+                $cell = $('<div/>')
+                    .addClass('cell')
+                    .data('x', i % width)
+                    .data('y', parseInt(i / width))
+                    .text(map[i].Status);
+                $row.append($cell);
             }
-
-            //  $('.game').append(arrRow);
         }
+
+        function refreshMap(cells) {
+            for (var i = 0; i < cells.length; i++) {
+                $('.cell[data-x=' + cells[i].X + '][data-y=' + cells[i].Y + ']').text(cells[i].Status);
+            }
+        }
+
+        $(function () {
+
+        })
     </script>
 </body>
 </html>

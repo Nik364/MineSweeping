@@ -14,13 +14,6 @@ namespace Nik.MineSweeping.Hubs
         static readonly List<MineCell> historys = new List<MineCell>();
         static Mine game;
 
-
-        [HubMethodName("hello")]
-        public void Hello()
-        {
-            Clients.All.hello("lalalla");
-        }
-
         /// <summary>
         /// 游戏开始
         /// </summary>
