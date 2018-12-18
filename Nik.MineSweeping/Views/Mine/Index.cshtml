@@ -9,6 +9,7 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>Index</title>
+    <!--UI参考链接：https://github.com/xxx407410849/MinesSweeper-->
     <style>
         .game {
         }
@@ -23,10 +24,37 @@
                 line-height: 30px;
                 text-align: center;
                 cursor: pointer;
-                background-color: aquamarine;
+                /*background-color: aquamarine;
                 margin-left: 2px;
                 margin-top: 2px;
+                display: inline-block;*/
+                top: 0;
+                left: 0;
+                margin: 0;
+                /*margin-top: -4.8px;*/
+                padding: 0;
+                border: 1px solid rgb(218, 228, 229);
             }
+
+
+                .game .cell.unknow {
+                    /*opacity: 0;*/
+                    background-color: rgb(218, 228, 229);
+                    box-shadow: 1px 0px 10px #1B6D85;
+                }
+
+                .game .cell.empty {
+                    background-color: #F1F1F1;
+                    box-shadow: 1px 0px 10px #101010 inset;
+                    /*font-size: 18px;*/
+                    font-weight: 600;
+                    font-family: "Romantic";
+                }
+
+                .game .cell.tip {
+                    background-color: #F2F2F2;
+                    box-shadow: 1px 0px 10px #5CB85C inset;
+                }
     </style>
 </head>
 <body>
@@ -43,7 +71,6 @@
     <script>
         $(function () {
             //$('#sName').text(prompt('请输入玩家名称'));
-
 
             var conn = $.connection;
             conn.hub.qs = { "name": $('#sName').text() };
@@ -68,27 +95,25 @@
                     mine.server.start(10, 10, 10).fail(function (e) { console.log(e) });
                 })
 
-                $('.game').delegate('.cell', 'click', function () {
+                $('.game').delegate('.cell', 'mousedown', function (e) {
+                    if (e.button == 1) {
+                        // 点击滚轮
+                        return;
+                    }
+
                     var $cell = $(this);
                     console.log($cell.data('x') + '-' + $cell.data('y'));
                     mine.server
-                        .click(0, {
+                        // 0左键 2右键
+                        .click(e.button == 2 ? 1 : 0, {
                             x: $cell.data('x'),
                             y: $cell.data('y')
                         })
                         .fail(function (e) {
                             console.log(e);
                         });
-                })
-
-                //mine.server.hello()
-                //    .done(function () {
-
-                //    })
-                //    .fail(function (e) {
-                //        alert(e);
-                //    });
-            })
+                });
+            });
         });
     </script>
     <script>
@@ -103,22 +128,49 @@
                 }
 
                 $cell = $('<div/>')
-                    .addClass('cell')
-                    .data('x', i % width)
-                    .data('y', parseInt(i / width))
-                    .text(map[i].Status);
+                    .addClass('cell unknow')
+                    //.data('x', i % width)
+                    //.data('y', parseInt(i / width))
+                    .attr('data-x', i % width)
+                    .attr('data-y', parseInt(i / width))
+                    .html('&nbsp;');
+                    //.text(map[i].Status)
                 $row.append($cell);
             }
         }
 
         function refreshMap(cells) {
             for (var i = 0; i < cells.length; i++) {
-                $('.cell[data-x=' + cells[i].X + '][data-y=' + cells[i].Y + ']').text(cells[i].Status);
+                var $cell = $('.cell[data-x=' + cells[i].X + '][data-y=' + cells[i].Y + ']');
+                $cell.removeClass('unknow');
+
+                switch (cells[i].Status)
+                {
+                    case 0:
+                        $cell.html('&nbsp;').addClass('empty');
+                        break;
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                    case 8:
+                        $cell.text(cells[i].Status).addClass('tip');
+                        break;
+                    default:
+                        $cell.text(cells[i].Status);
+                        break;
+                }
             }
         }
 
         $(function () {
-
+            $(document).bind("contextmenu", function (e) {
+                // 禁止右键菜单事件
+                return false;
+            });
         })
     </script>
 </body>

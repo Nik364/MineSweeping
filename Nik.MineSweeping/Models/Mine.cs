@@ -154,15 +154,20 @@ namespace Nik.MineSweeping.Models
                 }
                 Debug.Write($"{this.Map[i].Status}\t");
             }
-
-            // 循迹
+            
             List<MineCell> list;
             if (action == UserAction.LeftClick)
             {
+                // 寻迹
                 list = this.Trailing(cell);
+                if (list.Count <= 0)
+                {
+                    int i = 0;
+                }
             }
             else
             {
+                // 设置标识
                 list = this.SetMark(cell);
             }
 

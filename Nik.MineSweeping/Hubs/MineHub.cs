@@ -29,7 +29,8 @@ namespace Nik.MineSweeping.Hubs
             }
 
             game.Start();
-            Clients.All.start(width, heigth, game.Map);
+            // 只通知请求开始的客户端
+            Clients.Caller.start(width, heigth, game.Map);
         }
 
         /// <summary>
