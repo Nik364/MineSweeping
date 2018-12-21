@@ -16,7 +16,7 @@ namespace Nik.MineSweeping
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
-                defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
+                defaults: new { controller = "Mine", action = "Index", id = UrlParameter.Optional }
             );
         }
     }

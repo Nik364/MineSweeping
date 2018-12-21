@@ -115,6 +115,7 @@
     <Content Include="Scripts\font\iconfont.eot" />
     <Content Include="Scripts\font\iconfont.ttf" />
     <Content Include="Scripts\font\iconfont.woff" />
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Scripts\jquery-1.6.4-vsdoc.js" />
     <Content Include="Scripts\font\iconfont.svg" />
     <Content Include="Scripts\jquery-1.6.4.js" />
