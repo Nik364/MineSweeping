@@ -111,7 +111,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
+    <Content Include="Scripts\css\iconfont.css" />
+    <Content Include="Scripts\font\iconfont.eot" />
+    <Content Include="Scripts\font\iconfont.ttf" />
+    <Content Include="Scripts\font\iconfont.woff" />
     <None Include="Scripts\jquery-1.6.4-vsdoc.js" />
+    <Content Include="Scripts\font\iconfont.svg" />
     <Content Include="Scripts\jquery-1.6.4.js" />
     <Content Include="Scripts\jquery-1.6.4.min.js" />
     <Content Include="Scripts\jquery.signalR-2.4.0.js" />

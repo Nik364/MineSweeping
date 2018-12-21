@@ -18,19 +18,20 @@ namespace Nik.MineSweeping.Hubs
         /// 游戏开始
         /// </summary>
         /// <param name="width"></param>
-        /// <param name="heigth"></param>
+        /// <param name="height"></param>
         /// <param name="mineNum"></param>
         [HubMethodName("start")]
-        public void Start(int width, int heigth, int mineNum)
+        public void Start(int width, int height, int mineNum)
         {
             if (game == null)
             {
-                game = new Mine(width, heigth, mineNum);
+                game = new Mine(width, height, mineNum);
             }
 
             game.Start();
             // 只通知请求开始的客户端
-            Clients.Caller.start(width, heigth, game.Map);
+            //Clients.Caller.start(width, height, game.Map);
+            Clients.All.start(width, height, game.Map);
         }
 
         /// <summary>
@@ -43,6 +44,32 @@ namespace Nik.MineSweeping.Hubs
         {
             var result = game.Click(act, cell);
             Clients.All.click(result);
+
+            if (!game.IsPalying)
+            {
+                this.GameOver();
+            }
+        }
+
+        /// <summary>
+        /// 游戏重置
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="mineNum"></param>
+        [HubMethodName("reset")]
+        public void Reset(int width, int height, int mineNum)
+        {
+            game = null;
+            this.Start(width, height, mineNum);
+        }
+
+        /// <summary>
+        /// 游戏结束
+        /// </summary>
+        private void GameOver()
+        {
+            Clients.All.gameOver();
         }
 
         /// <summary>

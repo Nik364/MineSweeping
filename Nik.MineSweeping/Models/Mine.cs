@@ -20,22 +20,27 @@ namespace Nik.MineSweeping.Models
         /// <summary>
         /// 地雷数量
         /// </summary>
-        public int MineNum { get; set; }
-        
+        public int MineNum { get; private set; }
+
         /// <summary>
         /// 游戏地图
         /// </summary>
         public MineCell[] Map { get; private set; }
 
         /// <summary>
+        /// 游戏是否正在进行
+        /// </summary>
+        public bool IsPalying { get; private set; } = false;
+
+        /// <summary>
+        /// 游戏结束通知器
+        /// </summary>
+        // public Action<bool> GameOverNotify;
+
+        /// <summary>
         /// 是否初次点击
         /// </summary>
         bool isFisrtClick;
-
-        /// <summary>
-        /// 游戏是否正在进行
-        /// </summary>
-        bool isPalying = false;
 
         /// <summary>
         /// ctor
@@ -61,13 +66,13 @@ namespace Nik.MineSweeping.Models
         /// </summary>
         public Mine Start()
         {
-            if (isPalying)
+            if (this.IsPalying)
             {
                 return this;
             }
 
             this.isFisrtClick = true;
-            this.isPalying = true;
+            this.IsPalying = true;
             InitMap();
             return this;
         }
@@ -142,6 +147,9 @@ namespace Nik.MineSweeping.Models
                 // 初次点击布雷
                 this.LayMines(cell);
                 this.isFisrtClick = false;
+
+                // 初次点击 只能是左键单击
+                action = UserAction.LeftClick;
             }
 
 
@@ -154,16 +162,18 @@ namespace Nik.MineSweeping.Models
                 }
                 Debug.Write($"{this.Map[i].Status}\t");
             }
-            
+
+            if (!this.CheckClick(action, cell))
+            {
+                // 不可点击
+                return new List<MineCell>();
+            }
+
             List<MineCell> list;
             if (action == UserAction.LeftClick)
             {
                 // 寻迹
                 list = this.Trailing(cell);
-                if (list.Count <= 0)
-                {
-                    int i = 0;
-                }
             }
             else
             {
@@ -176,14 +186,31 @@ namespace Nik.MineSweeping.Models
         }
 
         /// <summary>
-        /// 设置标记
+        /// 点击验证
         /// </summary>
+        /// <param name="action"></param>
         /// <param name="cell"></param>
         /// <returns></returns>
-        private List<MineCell> SetMark(MineCell cell)
+        private bool CheckClick(UserAction action, MineCell cell)
         {
-            var list = new List<MineCell>();
-            return list;
+            var curCell = this.FindCell(cell.X, cell.Y);
+            if (action == UserAction.LeftClick)
+            {
+                if (curCell.Status != CellStatus.Unknown)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if (curCell.Status != CellStatus.Unknown
+                    && curCell.Status != CellStatus.Marker
+                    && curCell.Status != CellStatus.MineMarker)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         /// <summary>
@@ -201,11 +228,10 @@ namespace Nik.MineSweeping.Models
 
             var curCell = this.FindCell(cell.X, cell.Y);
 
-
             // 1、判断自己是否为地雷
             if (curCell.IsMine)
             {
-                return closed;
+                return this.GameOver(false);
             }
 
             // 2、开始检索
@@ -273,12 +299,81 @@ namespace Nik.MineSweeping.Models
         }
 
         /// <summary>
+        /// 设置标记
+        /// </summary>
+        /// <param name="cell"></param>
+        /// <returns></returns>
+        private List<MineCell> SetMark(MineCell cell)
+        {
+            cell = this.FindCell(cell.X, cell.Y);
+
+            var list = new List<MineCell>();
+            switch (cell.Status)
+            {
+                case CellStatus.Unknown:
+                    cell.Status = CellStatus.MineMarker;
+                    list.Add(cell);
+                    break;
+                case CellStatus.MineMarker:
+                    cell.Status = CellStatus.Marker;
+                    list.Add(cell);
+                    break;
+                case CellStatus.Marker:
+                    cell.Status = CellStatus.Unknown;
+                    list.Add(cell);
+                    break;
+            }
+
+            if (cell.Status == CellStatus.MineMarker)
+            {
+                // 地雷标记，检查地雷是否被全部标记完成
+                int num = 0;
+                foreach (var item in this.Map)
+                {
+                    if (!item.IsMine)
+                    {
+                        continue;
+                    }
+
+                    if (item.Status != CellStatus.MineMarker)
+                    {
+                        // 标记错误
+                        continue;
+                    }
+                    num++;
+                }
+                if (num == this.MineNum)
+                {
+                    // 全部标记正确
+                    return this.GameOver(true);
+                }
+            }
+            return list;
+        }
+
+        /// <summary>
         /// 检查地图状态  游戏是否完成
         /// </summary>
+        /// <param name="isSuccess">游戏是否成功</param>
         /// <returns></returns>
-        private bool CheckStatus()
+        private List<MineCell> GameOver(bool isSuccess)
         {
-            return true;
+            // 游戏结束
+            this.IsPalying = false;
+
+            List<MineCell> mines = new List<MineCell>();
+            CellStatus status = isSuccess ? CellStatus.MineDisplay : CellStatus.MineActive;
+
+            // 返回所有地雷位置，并修改单元格状态
+            foreach (var item in this.Map)
+            {
+                if (item.IsMine)
+                {
+                    item.Status = status;
+                    mines.Add(item);
+                }
+            }
+            return mines;
         }
 
         /// <summary>
@@ -385,9 +480,14 @@ namespace Nik.MineSweeping.Models
         Unknown = -1,
 
         /// <summary>
-        /// 地雷爆炸
+        /// 地雷爆炸（游戏失败结束）
         /// </summary>
-        MineExploded = -11,
+        MineActive = -11,
+
+        /// <summary>
+        /// 地雷显示（游戏成功结束）
+        /// </summary>
+        MineDisplay = -12,
 
         /// <summary>
         /// 未知标记

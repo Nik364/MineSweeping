@@ -21,5 +21,17 @@ namespace Nik.MineSweeping.Controllers
             //ViewBag.Mine = JsonConvert.SerializeObject(mine.Map);
             return View();
         }
+
+        public ActionResult Manage()
+        {
+            //var mine = new Mine(5, 5, 10);
+            //mine.Start().Click(UserAction.LeftClick, new MineCell
+            //{
+            //    X = 3,
+            //    Y = 6
+            //});
+            //ViewBag.Mine = JsonConvert.SerializeObject(mine.Map);
+            return View();
+        }
     }
 }

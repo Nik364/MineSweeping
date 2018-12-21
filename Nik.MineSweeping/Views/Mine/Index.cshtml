@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     Layout = null;
 }
 
@@ -9,12 +8,14 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>Index</title>
-    <!--UI参考链接：https://github.com/xxx407410849/MinesSweeper-->
+    <link href="~/Scripts/css/iconfont.css" rel="stylesheet" />
     <style>
         .game {
+            font-size: 0px;
         }
 
             .game .row {
+                clear: both;
             }
 
             .game .cell {
@@ -22,18 +23,15 @@
                 width: 30px;
                 height: 30px;
                 line-height: 30px;
-                text-align: center;
                 cursor: pointer;
-                /*background-color: aquamarine;
-                margin-left: 2px;
-                margin-top: 2px;
-                display: inline-block;*/
                 top: 0;
                 left: 0;
                 margin: 0;
-                /*margin-top: -4.8px;*/
                 padding: 0;
                 border: 1px solid rgb(218, 228, 229);
+                font-size: 18px;
+                box-sizing: border-box;
+                float: left;
             }
 
 
@@ -46,15 +44,67 @@
                 .game .cell.empty {
                     background-color: #F1F1F1;
                     box-shadow: 1px 0px 10px #101010 inset;
-                    /*font-size: 18px;*/
-                    font-weight: 600;
-                    font-family: "Romantic";
                 }
 
                 .game .cell.tip {
                     background-color: #F2F2F2;
                     box-shadow: 1px 0px 10px #5CB85C inset;
+                    text-align: center;
                 }
+
+                .game .cell.flag {
+                    background-color: #D0E9C6;
+                    box-shadow: 1px 0px 10px #101010;
+                }
+
+                    .game .cell.flag:before {
+                        font-family: "iconfont" !important;
+                        font-size: 20px;
+                        color: #C7254E;
+                        padding-left: 5px;
+                        padding-top: 0px;
+                        content: "\e504";
+                        position: absolute;
+                        font-style: normal;
+                        -webkit-font-smoothing: antialiased;
+                    }
+
+                .game .cell.minedispaly {
+                    background-color: #FBC599;
+                    box-shadow: 1px 0px 10px #D93B58 inset;
+                }
+
+                    .game .cell.minedispaly:before,
+                    .game .cell.mine-active:before {
+                        font-family: "iconfont" !important;
+                        font-size: 20px;
+                        padding-left: 5px;
+                        padding-top: 0px;
+                        content: "\e60c";
+                        position: absolute;
+                        color: #F2EBD5;
+                        font-style: normal;
+                        -webkit-font-smoothing: antialiased;
+                    }
+
+                .game .cell.mine-active {
+                    background-color: #D95F5F;
+                    box-shadow: 1px 0px 10px #080808 inset;
+                }
+
+                    .game .cell.mine-active:before {
+                        color: #FAFAFA;
+                        content: "\e601";
+                    }
+
+                .game .cell.marker {
+                    box-shadow: 1px 0px 10px #080808 inset;
+                }
+
+                    .game .cell.marker:before {
+                        padding-left: 10px;
+                        content: "?";
+                    }
     </style>
 </head>
 <body>
@@ -65,9 +115,13 @@
 
     </div>
     <input type="button" id="btnStart" value="游戏开始" />
+    <input type="button" id="btnReset" value="游戏重置" />
     <script src="~/Scripts/jquery-1.6.4.min.js"></script>
     <script src="~/Scripts/jquery.signalR-2.4.0.min.js"></script>
     <script src="~/signalr/js"></script>
+    <script>
+        console.log("UI参考链接：https://github.com/xxx407410849/MinesSweeper");
+    </script>
     <script>
         $(function () {
             //$('#sName').text(prompt('请输入玩家名称'));
@@ -89,11 +143,22 @@
                 refreshMap(cells);
             };
 
+            mine.client.gameOver = function () {
+                setTimeout(function () {
+                    alert('游戏结束');
+                }, 500)
+
+            }
+
             // 开始链接
             conn.hub.start().done(function () {
                 $('#btnStart').click(function () {
                     mine.server.start(10, 10, 10).fail(function (e) { console.log(e) });
-                })
+                });
+
+                $('#btnReset').click(function () {
+                    mine.server.reset(15, 15, 35).fail(function (e) { console.log(e) });
+                });
 
                 $('.game').delegate('.cell', 'mousedown', function (e) {
                     if (e.button == 1) {
@@ -121,6 +186,7 @@
         function initMap(width, height, map) {
             var $row;
             var $cell;
+            $('.game').html('');
             for (var i = 0; i < map.length; i++) {
                 if (i % width == 0) {
                     $row = $('<div/>').addClass('row');
@@ -128,13 +194,10 @@
                 }
 
                 $cell = $('<div/>')
-                    .addClass('cell unknow')
-                    //.data('x', i % width)
-                    //.data('y', parseInt(i / width))
                     .attr('data-x', i % width)
-                    .attr('data-y', parseInt(i / width))
-                    .html('&nbsp;');
-                    //.text(map[i].Status)
+                    .attr('data-y', parseInt(i / width));
+
+                updateCell($cell, map[i].Status);
                 $row.append($cell);
             }
         }
@@ -142,27 +205,50 @@
         function refreshMap(cells) {
             for (var i = 0; i < cells.length; i++) {
                 var $cell = $('.cell[data-x=' + cells[i].X + '][data-y=' + cells[i].Y + ']');
-                $cell.removeClass('unknow');
 
-                switch (cells[i].Status)
-                {
-                    case 0:
-                        $cell.html('&nbsp;').addClass('empty');
-                        break;
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                    case 5:
-                    case 6:
-                    case 7:
-                    case 8:
-                        $cell.text(cells[i].Status).addClass('tip');
-                        break;
-                    default:
-                        $cell.text(cells[i].Status);
-                        break;
-                }
+                updateCell($cell, cells[i].Status);
+            }
+        }
+
+        /**
+         * 更新、完善单元格
+         * @@param {JqObject} $cell 单元格
+         * @@param {int} status 状态码
+         */
+        function updateCell($cell, status) {
+            $cell.prop('class', 'cell');
+            switch (status) {
+                case 0:
+                    $cell.addClass('empty');
+                    break;
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                    $cell.addClass('tip').text(status);
+                    break;
+                case -1:
+                    $cell.addClass('unknow');
+                    break;
+                case -11:
+                    $cell.addClass('mine-active');
+                    break;
+                case -12:
+                    $cell.addClass('minedispaly');
+                    break;
+                case -18:
+                    $cell.addClass('marker');
+                    break;
+                case -19:
+                    $cell.addClass('flag');
+                    break;
+                default:
+                    $cell.text(status);
+                    break;
             }
         }
 
